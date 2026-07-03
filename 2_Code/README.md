@@ -1,22 +1,64 @@
-# 2_Code/ - 源代码目录
+# 2_Code/ - 混沌双摆数值模拟源代码
 
-**目的**: 存放所有用于模拟、分析和可视化的代码。代码的质量是评分的重要组成部分。
+## 文件说明
 
-### **结构原则：**
-本项目**不强制要求固定文件名**，但必须遵循**逻辑解耦**的原则。建议按照以下功能模块划分您的代码：
+| 文件 | 功能 |
+|------|------|
+| `double_pendulum.py` | 物理模型: 双摆 ODE 系统 (含阻尼驱动拓展)、能量计算 |
+| `solvers.py` | ODE 求解器集合: Euler / RK4 / Symplectic Euler / Verlet / RK45 |
+| `main.py` | **入口模块**: 参数配置、验证流程、轨迹对比、初值敏感性演示 |
+| `analysis.py` | 混沌诊断: FFT 功率谱、Lyapunov 指数、Poincaré 截面 |
+| `visualization.py` | 可视化: 相空间轨迹图、双摆运动动画、能量漂移图 |
+| `requirements.txt` | Python 环境依赖清单 |
 
-1.  **入口模块** (如 `main.py`): 负责设置物理参数、初始化环境、调用算法并启动流程。
-2.  **物理/算法模块** (如 `solvers.py` 或 `physics.py`): 实现核心数值算法（如 RK4, Metropolis, PINN 损失函数等）。应保持独立性，不包含绘图逻辑。
-3.  **分析与可视化** (如 `analysis.py` 或 `plot_utils.py`): 负责处理原始数据、计算物理量（如能量偏差、关联函数）并生成论文所需的图表。
+## 环境配置
 
-### **必需文件：**
-- **`README.md` (本文件)**: 必须清晰说明：
-    - 每个代码文件的功能。
-    - 如何配置环境 (`pip install -r requirements.txt`)。
-    - **如何运行主程序**以得到论文中的结果。
-- **`requirements.txt`**: 项目依赖清单。
+```bash
+pip install -r requirements.txt
+```
 
-### **代码规范要求：**
-- **物理注释**: 必须对核心物理方程和算法步骤进行注释。
-- **参数化设计**: 物理参数应集中定义，严禁在循环中出现“魔法数字”。
-- **AI 声明**: 若使用 AI 辅助编写，需在代码中注明。
+核心依赖: `numpy`, `scipy`, `matplotlib`
+
+## 如何运行
+
+### 快速验证 (推荐首次运行)
+```bash
+python main.py --quick
+```
+- 退化到单摆验证
+- 收敛阶测试 (log-log 图)
+- 能量守恒性对比
+
+### 完整模拟
+```bash
+python main.py --full
+```
+额外运行:
+- 各方法轨迹对比 (θ1(t) 轨线)
+- 初值敏感性演示 (蝴蝶效应 + Lyapunov 指数估算)
+
+### 仅运行验证模块
+```bash
+python main.py --verify-only
+```
+
+## 模块结构
+
+```
+main.py  ──→  double_pendulum.py  (物理模型, ODE 右端)
+         ──→  solvers.py          (四种求解器 + RK45 参考解)
+         ──→  analysis.py         (混沌诊断分析)
+         ──→  visualization.py    (图表与动画)
+```
+
+## 代码规范
+
+- 所有物理参数在 `main.py` 顶部集中定义 (`PendulumParams` 数据类)
+- 求解器保持独立性, 不含绘图逻辑
+- 变量命名具有物理含义 (theta, omega, alpha 等)
+- 核心方程与算法步骤包含物理注释
+
+## AI 使用声明
+
+本项目使用 DeepSeek-V4-pro 辅助完成: ODE 求解公式推导、求解器代码实现、
+主流程代码编写。所有 AI 辅助部分在相应文件头部已注明。
